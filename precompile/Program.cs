@@ -244,32 +244,42 @@ namespace ProtoBuf.Precompile
                 {
                     string root = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
                     if (string.IsNullOrEmpty(root)) root = Environment.GetEnvironmentVariable("ProgramFiles");
-                    root = Path.Combine(root, @"Reference Assemblies\Microsoft\Framework\");
-                    if (!Directory.Exists(root))
+
+                    if (root == null)
                     {
-                        Console.Error.WriteLine("Framework reference assemblies root folder could not be found");
-                        allGood = false;
+                        Console.WriteLine("Unable to detect .NET Framework version. Skipping...");
                     }
                     else
                     {
-                        string frameworkRoot = Path.Combine(root, Framework);
-                        if (Directory.Exists(frameworkRoot))
+                        root = Path.Combine(root, @"Reference Assemblies\Microsoft\Framework\");
+
+                        if (!Directory.Exists(root))
                         {
-                            // fine
-                            probePaths.Add(frameworkRoot);
+                            Console.Error.WriteLine("Framework reference assemblies root folder could not be found");
+                            allGood = false;
                         }
                         else
                         {
-                            Console.Error.WriteLine("Framework not found: " + Framework);
-                            Console.Error.WriteLine("Available frameworks are:");
-                            string[] files = Directory.GetFiles(root, "mscorlib.dll", SearchOption.AllDirectories);
-                            foreach (var file in files)
+                            string frameworkRoot = Path.Combine(root, Framework);
+                            if (Directory.Exists(frameworkRoot))
                             {
-                                string dir = Path.GetDirectoryName(file);
-                                if (dir.StartsWith(root)) dir = dir.Substring(root.Length);
-                                Console.Error.WriteLine(dir);
+                                // fine
+                                probePaths.Add(frameworkRoot);
                             }
-                            allGood = false;
+                            else
+                            {
+                                Console.Error.WriteLine("Framework not found: " + Framework);
+                                Console.Error.WriteLine("Available frameworks are:");
+                                string[] files = Directory.GetFiles(root, "mscorlib.dll", SearchOption.AllDirectories);
+                                foreach (var file in files)
+                                {
+                                    string dir = Path.GetDirectoryName(file);
+                                    if (dir.StartsWith(root)) dir = dir.Substring(root.Length);
+                                    Console.Error.WriteLine(dir);
+                                }
+
+                                Console.Error.WriteLine("Continuing without framework information.");
+                            }
                         }
                     }
                 }
@@ -515,7 +525,7 @@ Example:
             bool allGood = true;
             var props = typeof(T).GetProperties();
 
-            char[] leadChars = {'/', '+', '-'};
+            char[] leadChars = {'+', '-'};
             for (int i = 0; i < args.Length; i++)
             {
                 string arg = args[i].Trim(), prefix, value;
