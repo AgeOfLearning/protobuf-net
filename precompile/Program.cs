@@ -399,6 +399,7 @@ namespace ProtoBuf.Precompile
             toAdd.Sort((x, y) => string.Compare(x.FullName, y.FullName));            
             foreach (var type in toAdd)
             {
+                if (type.IsGenericType) continue;
                 Console.WriteLine("Adding " + type.FullName + "...");
                 var tmp = model.Add(type, true);
                 if (metaType == null) metaType = tmp; // use this as the template for the framework version
