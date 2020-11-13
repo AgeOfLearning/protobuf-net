@@ -380,6 +380,7 @@ namespace ProtoBuf.Precompile
                         switch(name) 
                         {
                             case "ProtoBuf.ProtoContractAttribute":
+                            case "System.Runtime.Serialization.DataContractAttribute":
                                 add = true;
                                 break;
                         }
@@ -391,7 +392,7 @@ namespace ProtoBuf.Precompile
 
             if (toAdd.Count == 0)
             {
-                Console.Error.WriteLine("No [ProtoContract] types found; nothing to do!");
+                Console.Error.WriteLine("No [ProtoContract] or [DataContract] types found; nothing to do!");
                 return false;
             }
 
